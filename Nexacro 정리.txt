@@ -1,0 +1,63 @@
+https://www.playnexacro.com/#show:techtip:413 - 넥사 단축키
+http://docs.tobesoft.com/developer_guide_nexacro_17_ko#95c557bf254408db - 넥사 활용북
+
+< Script 소스편집 >
+
+Ctrl + ] : 현재 선택된 brace 매치되는 brace로 이동
+Ctrl + Shift + ] : 현재 선택된 brace에 매치되는 brace로 커서가 이동하면서 이동영역 모두 선택
+Ctrl + Shift + L : 커서위치 한 줄 삭제
+
+< Component > 
+
+/* 하나의 함수로 여러 컴포넌트에 돌려 쓰는방법 
+버튼 2개 각각 id 1, 2라고 가정하고, Button_onclick함수를 하나 만든다.
+this.alert(e.fromobject.id); 로 함수의 내용을 작성하면 어느버튼이던 이벤트를 사용할 수 있다.
+
+fromobject란 이벤트 발생의 원인이 되는 컴포넌트를 갖는 속성임.
+*/
+
+/* 컴포넌트에 이벤트생성 할 때, 스크립트단에서 바로 하지말고 
+Properties(alt+enter)에서 원하는 이벤트에 원하는 변수명 적고 엔터치면 스크립트 단에서 자동으로 생성됨. 
+*/
+
+Static - 화면에 일정한 문자열을 출력하기 위해 사용하는 컴포넌트
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Button - 사용자가 마우스를 클릭해서 지저한 스크립트를 수행하게 하는 컴포넌트
+-> onclick 이벤트를 추가하여 함수 내부에서 js코드로 이벤트를 처리한다.
+-> 아래의 onclick 함수는 nexacro에서 만들어줌 내부 내용을 내가 작성한거
+
+this.Button00_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	console.log("hi");
+};
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Edit - 한 줄의 문자열 입력 또는 출력하는 컴포넌트. 모든 문자열의 입력이 가능하며, 경우에 따라 원하는 문자열만 입력 받을 수 있음.
+-> es6문법중 안먹히는게 몇개있음. ``(백틱)안됨 const, let써지길레 그냥 사용함
+-> postvalue, posttext의 차이가 뭔진 모르겠는데 value가 익숙해서 그냥 value씀
+-> test에 trace함수를 써서 해당 함수가달린 edit의 값을 test에 담았는데 저 한줄만으로 console에 로그가찍힘. 따로 console.log출력 문을 안써도됨.
+-> trace는 값을 담는 개념은 아닌거같음.
+-> http://docs.tobesoft.com/nexacro_technical_note_ko#c24f3f4b1a2690e1 - Edit/MaskEdit 의 값을 바로 바인드 시켜서 담는거 같은데 값넘길때 이렇게 하면될거같음.
+
+this.EditTest_onchanged = function(obj:nexacro.Edit,e:nexacro.ChangeEventInfo)
+{
+	const test = trace(e.postvalue);
+	const test2 = "hi";
+	let test3 = ['1,','2',3];
+	
+	console.log(test2);
+	console.log("안녕하세요" + test2);
+	console.log(test3[2]);
+	
+};
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MaskEdit - 정해진 형식으로 입/출력할 때 사용하는 Edit 계열의 컴포넌트. 
+사용법은 Edit과 유사하며 형식이 정해져있는 주민등록번호, 전화번호, 날짜 같은정보에 유용하다.
+패스워드 처리가 가능하며 brace로 감싸면 Asterisk로 대체되어 출력됨 ( format에 ######-#{######} 이런식으로하면 주민번호가 940808-1****** 이렇게 출력 )
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TextArea - 여러 줄로 된 문자열을 입력 또는 출력하는 컴포넌트.
+-> Dataset을 1개의 하나의 요소(Column)을 연결시킬 수 있다. value형태로 들어간다.
+-> readonly 옵션을 true로 주면, 읽기만됨 수정커서 안뜸.  
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Calender는 날짜와 시간을 입력하는 컴포넌트이며 월 단위로 보고 선택하는 방식과 직접 입력하는 방식 등이 가능하며, 입력한 날짜가 정확한 날짜인지 체크 된다.
