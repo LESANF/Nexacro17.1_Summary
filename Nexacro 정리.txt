@@ -1,5 +1,45 @@
 https://www.playnexacro.com/#show:techtip:413 - 넥사 단축키
 http://docs.tobesoft.com/developer_guide_nexacro_17_ko#95c557bf254408db - 넥사 활용북
+http://docs.tobesoft.com/developer_guide_nexacro_17_ko#32d7381dc6dc1f6d - DataSet, Data Binding
+
+< 데이터 셋 (Dataset) >
+
+Dataset은 데이터베이스 자원을 효율적으로 활용하고자 도입된 개념.
+한정적인 데이터베이스 자원에 다수 사용자의 지속적인 연결로 인해 발생하는 오버헤드는 성능저하의 주 요인.
+이를 해결하고자, 데이터베이스에 대한 지속적 연결없이 데이터 작업이 가능한 비연결지향 방식의 Dataset 사용
+
+일반적으로 Dataset은 독자적으로 사용하지 않고, 데이터를 시각적으로 표현하는 컴포넌트에 바인딩하는 형태로 사용
+Grid, Combo, ListBox 등의 컴포넌트는 화면에 보여주기 위한 형태만 가지고 있을 뿐 실제로 의미있는 데이터는 Dataset이 갖고있다.
+
+< 데이터 바인딩(Data Binding) >
+
+데이터 바인딩은 데이터 정보를 담고 있는 Dataset 오브젝트와 시각적으로 표현되는 컴포넌트 간에 데이터와 정보를 연결하고
+상호 동기화하는 기법. 바인딩 기법은 그 사용 방법에 따라 다름의 네가지로 나눠볼 수 있음.
+
+- Full Biding / Master & Detail Binding / Lookup Binding / Presentation Binding
+
+FULL BINDING 
+: Grid는 그 형태가 Dataset과 논리적으로 같은 컴포넌트다. 따라서 Grid는 Dataset과 완전히 맵핑됨.
+이런 식으로 Dataset과 컴포넌트가 1대1로 완전히 맵핑될 수 있는 바인딩을 Full binding이라고 함.
+Grid만이 Full binding이 가능
+
+Master & Detail Binding
+: Grid와 단일 데이터를 표시하는 컴포넌트 사이의 binding이다.
+4개의 레코드가있는 Grid에서 하나의 레코드를 선택했을때, Edit 컴포넌트에 선택된 레코드가 입/출력 하는 경우가 이에 해당됨.
+
+Lookup Binding
+: 단일 데이터를 입/출력하는 컴포넌트가 내부에 또 다른 Dataset을 가지는 형태의 바인딩.
+Grid의 레코드를 선택했을때 Combo 컴포넌트에 선택된 레코드의 특정 Column을 연결하고 Combo에 바인딩되어 있는 Dataset에서
+그에 해당하는 값을 찾아 Combo에 출력하는 경우
+
+Presentation Binding
+: 컴포넌트에 출력하는 데이터에 스타일을 주는 용도의 바인딩 기법 
+
+F1을 활용해서 각 컴포넌트들의 method를 많이 활용해야함.
+
+워크북 예제를 하면서 getSum, getAvg등과 같이 비슷한 함수로 getCaseSum, getCaseAvg가 있다.
+받는 매개변수는 비슷하며, Case의 경우 첫번째 인자로 조건표현식을 추가함.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 < Script 소스편집 >
 
@@ -55,6 +95,10 @@ this.EditTest_onchanged = function(obj:nexacro.Edit,e:nexacro.ChangeEventInfo)
 MaskEdit - 정해진 형식으로 입/출력할 때 사용하는 Edit 계열의 컴포넌트. 
 사용법은 Edit과 유사하며 형식이 정해져있는 주민등록번호, 전화번호, 날짜 같은정보에 유용하다.
 패스워드 처리가 가능하며 brace로 감싸면 Asterisk로 대체되어 출력됨 ( format에 ######-#{######} 이런식으로하면 주민번호가 940808-1****** 이렇게 출력 )
+
+type에는 String, Number 형식이있다. format을 이용해 미리 입력받을 수 있는데, 문자형(알파벳)은 a, 숫자형은 #으로 처리할 수 있음. -(하이픈)도 처리가능
+예를 들어, type = String에서 aaaaaa-###### 이런식으로 format을 정해놓으면, qwerty-123456 이렇게 입력받을 수 있음. 입력하기전은 _ _ _ _ _ _ - _ _ _ _ _ _ 이렇게 표기.
+그리고 number 형으로가서 위와같이 하면 알파벳이 입력이안됨. 숫자만 입력가능.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TextArea - 여러 줄로 된 문자열을 입력 또는 출력하는 컴포넌트.
 -> Dataset을 1개의 하나의 요소(Column)을 연결시킬 수 있다. value형태로 들어간다.

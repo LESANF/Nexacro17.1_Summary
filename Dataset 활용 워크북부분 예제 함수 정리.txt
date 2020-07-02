@@ -1,0 +1,62 @@
+clearData - Column 정보 이외에 모든 데이터(row)를 삭제, 삭제된 데이터(row)의 갯수를 반환.
+rowCount - 해당 Dataset의 row 개수를 반환
+getRowType - 필터링 되어 보이지 않는 Row를 제외한 범위에서 지정된 row의 type을 반환
+Dataset.ROWTYPE_INSERT: 2, Dataset.ROWTYPE_UPDATE: 4, Dataset.ROWTYPE_DELETE: 8 ( Row 타입을 표시하는 상수는 아래의 값으로 처리됨
+rowPositon - 현재 선택된 데이터의 Row 인덱스를 갖는 속성
+addRow는 맨밑에 부터 row추가 InsertRow는 위부터
+setColumn - Column 값을 변경하는 메소드 
+this.Dataset00.setColumn(nRow, nColldx || strCollD, varVal) / 
+nRow - 값을 변경하려는 Column의 row 인덱스를 설정함. 
+nColldx - 값을 변경하려는 Column의 인덱스 설정
+strCollD - 값을 변경하려는 Column의 ID를 설정
+varVal - 병경하려는 Column의 값을 설정
+getColiD(nColldx) - Dataset에서 전달된 인덱스에 해당하는 Column의 ID를 반환하는 메소드
+nColldx는 number고 ID를 구하려는 Column의 인덱스를 설정 
+addColumn(strColID, strColType, [,nColSize]) - Dataset에 Column을 추가하는 메소드
+strColID - DataSet에 추가할 Column의 ID를 문자열로 설정
+strColType - Dataset에 추가할 Column의 타입을 설정
+nColSize - DataSet에 추가할 Column의 데이터 길이를 설정 값을 생략하면 "256"으로 적용
+getOrgColumn(nRow, nColIdx || strColID) - 필터링되어 보이지 않는 Row를 제외한 범위에서 지정한 Row와 Column의 초기값을 반환하는 메소드
+nRow - number형, 초기값을 구하려는 Row의 인덱스를 설정.
+nColIdx - number형, 초기값을 구하려는 Column의 인덱스를 설정.
+strColId - String형, 초기값을 구하려는 Column의 ID를 설정.
+
+
+this.fn_orgDataset = function()  // fn_orgDataset 함수 생성
+{
+    var sOrgCol = ""; // sOrgCol는 Column의 ID를 담기위한 변수
+    var sOrgVal = ""; // sOrgVal는 
+    this.Dataset01.clearData(); // excute에 들어갈 dataset(아무것도없음)을 클리어하는 함수.
+    
+    for (var i = 0; i < this.Dataset00.rowcount; i++) // Dataset00의 row개수만큼 반복문돌림
+    {
+        var nRowType = this.Dataset00.getRowType(i); // nRowType변수를 선언해주고 00의 RowType을 반환받음
+        if (nRowType == Dataset.ROWTYPE_INSERT || nRowType == Dataset.ROWTYPE_UPDATE) // Dataset.ROWTYPE_INSERT는 = 2, Dataset.ROWTYPE_UPDATE는 = 4를 의미
+        {										// INSERT되거나 UPDATE 됐을때 아래 if문 실행
+            this.Dataset01.addRow(); // Dataset01에 row 한줄 추가
+            this.Dataset01.setColumn(this.Dataset01.rowposition, "COL_TYPE", nRowType); // Dataset01에 Coulmn값을 변경해줌 위치는 rowPosition 현재위치, COL_TYPE로 ID설정, 변경하려는 column의 값은 앞에 선언한 nRowType
+            for (var j = 0; j < this.Dataset00.colcount; j++) // colcount는 Dataset00의 column의 개수를 구함. 해당 개수만큼 반복문돌림
+            {
+                sOrgCol = this.Dataset00.getColID(j); // j는 Dataset00의 column의 개수만큼 반복이 돌아가고, 해당 row의 Column의 ID를 저장함.
+                sOrgVal = this.Dataset00.getOrgColumn(i, sOrgCol); // 바로위에서 sOrgCol에 ID를 저장했고 getOrgColumn의 두번째 요소로 들어간다. i는 순서대로 row를 선택함. ID의 row값이 저장됨.
+
+                this.Dataset01.setColumn(this.Dataset01.rowposition, sOrgCol, sOrgVal); // 새로운 Dataset01에 setColumn으로 Column의 값을 넣어줌. 첫번째 요소로 인덱스인데 rowPositon으로 지정
+            }							         // 값을 변경하려는 Coulmn의 ID는 sOrgCol(Dataset00에서 가져온 ID임)
+        }								         // 변경하려는 Column의 값은 sOrgVal
+    }
+    
+    trace(this.Dataset00.getDeletedRowset().length);
+    for (var i = 0; i < this.Dataset00.getDeletedRowCount(); i++) 
+    {
+        this.Dataset01.addRow();
+        this.Dataset01.setColumn(this.Dataset01.rowposition, "COL_TYPE", Dataset.ROWTYPE_DELETE);
+        for (var j = 0; j < this.Dataset00.colcount; j++) 
+        {
+            sOrgCol = this.Dataset00.getColID(j);
+            sOrgVal = this.Dataset00.getDeletedColumn(i, sOrgCol);
+            this.Dataset01.setColumn(this.Dataset01.rowposition, sOrgCol, sOrgVal);
+        }
+    }
+    
+    this.Grid01.createFormat();
+};
