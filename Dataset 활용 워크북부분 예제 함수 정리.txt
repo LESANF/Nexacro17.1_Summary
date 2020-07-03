@@ -22,30 +22,53 @@ nColIdx - number형, 초기값을 구하려는 Column의 인덱스를 설정.
 strColId - String형, 초기값을 구하려는 Column의 ID를 설정.
 
 
-this.fn_orgDataset = function()  // fn_orgDataset 함수 생성
+this.Button00_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
 {
-    var sOrgCol = ""; // sOrgCol는 Column의 ID를 담기위한 변수
-    var sOrgVal = ""; // sOrgVal는 
-    this.Dataset01.clearData(); // excute에 들어갈 dataset(아무것도없음)을 클리어하는 함수.
-    
-    for (var i = 0; i < this.Dataset00.rowcount; i++) // Dataset00의 row개수만큼 반복문돌림
-    {
-        var nRowType = this.Dataset00.getRowType(i); // nRowType변수를 선언해주고 00의 RowType을 반환받음
-        if (nRowType == Dataset.ROWTYPE_INSERT || nRowType == Dataset.ROWTYPE_UPDATE) // Dataset.ROWTYPE_INSERT는 = 2, Dataset.ROWTYPE_UPDATE는 = 4를 의미
-        {										// INSERT되거나 UPDATE 됐을때 아래 if문 실행
-            this.Dataset01.addRow(); // Dataset01에 row 한줄 추가
-            this.Dataset01.setColumn(this.Dataset01.rowposition, "COL_TYPE", nRowType); // Dataset01에 Coulmn값을 변경해줌 위치는 rowPosition 현재위치, COL_TYPE로 ID설정, 변경하려는 column의 값은 앞에 선언한 nRowType
-            for (var j = 0; j < this.Dataset00.colcount; j++) // colcount는 Dataset00의 column의 개수를 구함. 해당 개수만큼 반복문돌림
-            {
-                sOrgCol = this.Dataset00.getColID(j); // j는 Dataset00의 column의 개수만큼 반복이 돌아가고, 해당 row의 Column의 ID를 저장함.
-                sOrgVal = this.Dataset00.getOrgColumn(i, sOrgCol); // 바로위에서 sOrgCol에 ID를 저장했고 getOrgColumn의 두번째 요소로 들어간다. i는 순서대로 row를 선택함. ID의 row값이 저장됨.
+    this.Dataset00.deleteRow(this.Dataset00.rowposition) // 선택된 row를 지움
+};
 
-                this.Dataset01.setColumn(this.Dataset01.rowposition, sOrgCol, sOrgVal); // 새로운 Dataset01에 setColumn으로 Column의 값을 넣어줌. 첫번째 요소로 인덱스인데 rowPositon으로 지정
-            }							         // 값을 변경하려는 Coulmn의 ID는 sOrgCol(Dataset00에서 가져온 ID임)
-        }								         // 변경하려는 Column의 값은 sOrgVal
+this.Button02_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+        this.Dataset00.addRow(); // 아래부터 row를 하나 추가
+};
+
+this.Button01_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+    this.Dataset01.addColumn("COL_TYPE", "STRING"); // COL_TYPE이라는 하나의 속성 생성함. ( ID / type )
+    for(var i=0;i<this.Dataset00.colcount;i++) // Dataset00의 속성을 긁어옴 colcount는 column의 갯수를 읽는거임
+    {
+        this.Dataset01.addColumn(this.Dataset00.getColID(i), "STRING"); // 이부분이 긁어온 Dataset00의 ID를 가져옴 
+    }																	// getColID는 index를 매개변수로 받고 해당하는 행에 ID를 가져옴
+    this.fn_orgDataset(); // 윗부분까지 하고 끝내려면 createFormat을 붙이고 끝내면되지만, 우리가 원하는결과물이 아님. fn_orgDataset 함수를 실행
+};
+
+this.fn_orgDataset = function() // fn_orgDataset 으로 함수 선언
+{
+    var sOrgCol = ""; // sOrgCol 변수 선언
+    var sOrgVal = ""; // sOrgVal 변수 선언
+    
+	this.Dataset01.clearData(); // 모든 row를 삭제함. 복구못함 복구하고싶으면 deleteAll을 사용.
+    
+    for (var i = 0; i < this.Dataset00.rowcount; i++)  // Dataset00의 row의 개수만큼 반복함
+    {
+        var nRowType = this.Dataset00.getRowType(i); // nRowType 변수를 생성하고 담기는건 Dataset00의 각행들의 Type임
+        if (nRowType == Dataset.ROWTYPE_INSERT || nRowType == Dataset.ROWTYPE_UPDATE) // INESRT는 == 2, UPDATE는 == 4를 의미.
+        {
+            this.Dataset01.addRow(); // execute로 실행될 grid에 row하나 추가
+            this.Dataset01.setColumn(this.Dataset01.rowposition, "COL_TYPE", nRowType); // rowPosition(현재위치)에서 "COL_TYPE" ID의 값을 nRowType으로 설정
+            for (var j = 0; j < this.Dataset00.colcount; j++)  // 위는 새롭게 만들어진 COL_TYPE에 대한 값을 넣는 부분, 여기는 Dataset00의 값을 긁어오는거
+            {
+                sOrgCol = this.Dataset00.getColID(j); // getColID는 매개변수로 number를 받고 해당하는 index의 Column ID를 가져옴 이중 for문이니주의 0,0-1-2-3, 1,0-1-2-3...
+				sOrgVal = this.Dataset00.getOrgColumn(i, sOrgCol); // getOrgColumn은 지정한 row와 column의 초기값을 반환하는 메소드
+				// 초기값을 반환하기때문에 INSERT, UPDATE로 작업이 이루어진 부분만 EXECUTE로 값이 나옴.
+				console.log(sOrgCol, sOrgVal);
+				// CODE A, CODE B, DATA 1, DATA 2 이런식으로 나옴 sOrgCol은 CODE, DATA즉 ID만 가져오고 sOrgVal은 그 id로 값을 가져옴
+                this.Dataset01.setColumn(this.Dataset01.rowposition, sOrgCol, sOrgVal); // rowPostion에서 sOrgCol(CODE,DATA) ID값을 sOrgVal로 바꾼다는말
+            }
+        }
     }
     
-    trace(this.Dataset00.getDeletedRowset().length);
+    trace(this.Dataset00.getDeletedRowset().length); // DELETE됐을때, 위는 INSERT, UPDATE
     for (var i = 0; i < this.Dataset00.getDeletedRowCount(); i++) 
     {
         this.Dataset01.addRow();
@@ -58,5 +81,5 @@ this.fn_orgDataset = function()  // fn_orgDataset 함수 생성
         }
     }
     
-    this.Grid01.createFormat();
+    this.Grid01.createFormat(); // 그리드를 동적으로 데이터를 바꿔주면 무조건 createFormat을 해줘야함.
 };
